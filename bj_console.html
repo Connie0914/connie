@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BlackJackシンプル</title>
+</head>
+
+<body>
+    <script>
+const deck1 = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13];
+// const deck2 = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13];
+// const deck3 = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13];
+// const deck4 = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13];
+
+let card;
+
+// Fisher–Yates shuffle(偏りのないシャッフル)
+const shuffle = (deck) => {
+    for (let i = deck.length - 1; i > 0; i--) {
+        //乱数生成を使ってランダムに取り出す値を決める
+        const j = Math.floor(Math.random() * (i + 1));
+        //取り出した値と箱の外の先頭の値を交換する
+        [deck[i], deck[j]] = [deck[j], deck[i]];
+    }
+    return deck;
+}
+//console.log(shuffle(deck1));
+//ex [1, 3, 2, 12, 13, 7, 8, 4, 10, 5, 6, 11, 9]
+
+const deal = () => {
+    const hand = [];
+    for (let i = 0; i < 2; i++) {
+        shuffle(deck1);
+        card = deck1.pop();
+        if (card === 11){
+            card = "J";
+        } 
+        if (card === 12){
+            card = "Q";
+        }
+        if (card === 13){
+            card = "K";
+        }
+        if (card === 1){
+            card = "A";
+        }
+        hand.push(card);
+    }
+    return hand;
+}
+
+// deal();
+// console.log(hand); //ex [ 'J', 7 ]
+
+const hit = (hand) => {
+    shuffle(deck1);
+    card = deck1.pop();
+    if (card === 11){
+        card = "J";
+    } 
+    if (card === 12){
+        card = "Q";
+    }
+    if (card === 13){
+        card = "K";
+    }
+    if (card === 1){
+        card = "A";
+    }
+    hand.push(card);
+    return hand;
+}
+
+
+const total = (hand) => {
+    let score = 0;
+    for (i = 0; i < hand.length; i++) {
+        if (hand[i] === "J" || hand[i] === "Q" || hand[i] === "K"){
+            score += 10;
+        } else if (hand[i] === "A"){
+            if (score >= 11) {
+                score += 1;
+            } else {
+                score += 11;
+            }
+        } else {
+            score += hand[i];
+        }
+    }
+    return score;
+}
+
+// const player_score = total(hand);
+// console.log(player_score);
+
+
+const play_again = () => {
+    const again = prompt("もう一度プレイしますか？ (Y/N): "); 
+    if (again === "y" || again === "Y") {
+        // game();
+        return
+    } else {
+        console.log("お疲れ様でした！");
+        //exit();
+    }
+}
+// play_again();
+
+const result = (dealer_hand,player_hand) => {
+    if (total(player_hand) > total(dealer_hand)) {
+        console.log(`ディーラーの合計は${total(dealer_hand)}、あなたの合計は${total(player_hand)}です。YOU WIN!!`);
+    } else if (total(dealer_hand) > total(player_hand)) {
+        console.log(`ディーラーの合計は${total(dealer_hand)}、あなたの合計は${total(player_hand)}です。YOU LOSE`);
+    } else {
+        console.log('引き分けです');
+    }
+}
+
+const game = () => {
+    dealer_hand = deal();
+    player_hand = deal();
+    console.log(`ディーラーのアップカードは${dealer_hand[0]}です`);
+    console.log(`プレイヤーのハンドは${player_hand} で、合計${total(player_hand)}です`);
+
+    let choice = 0;
+    let quit;
+
+    while (choice !== quit) {
+        choice = prompt("ヒットしますか？スタンドしますか？ (HIT/STAND): ").toLowerCase();
+        if (choice === "hit") {
+            hit(player_hand);
+            console.log(`あなたに${player_hand.slice(-1)[0]}が配られ、ハンドは${player_hand}、合計${total(player_hand)}です`);
+            if (total(player_hand) > 21) {
+                console.log("BURST あなたの負けです");
+                choice = quit;
+            }
+        } else if (choice === "stand") {
+            console.log(`ディーラー2枚目のカードは${dealer_hand[1]}で 合計${total(dealer_hand)}です`);
+            while (total(dealer_hand) < 17) {
+                hit(dealer_hand);
+                console.log(`ディーラーに${dealer_hand.slice(-1)[0]}が配られ、ハンドは${dealer_hand}、合計${total(dealer_hand)}です`);
+            }
+            if (total(dealer_hand) > 21) {
+                console.log("BURST あなたの勝ちです");
+                choice = quit;
+            }
+
+            if (total(dealer_hand) <=21) {
+                result(dealer_hand,player_hand);
+            }
+            choice = quit;
+            break;
+        }
+    }
+}
+
+game();
+
+
+    </script>
+</body>
+
+</html>
